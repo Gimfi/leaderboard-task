@@ -3,11 +3,14 @@
 //Any use, reproduction, distribution, or release of this code or documentation without the express permission
 //of Sophun Games LTD is strictly prohibited and could be subject to legal action.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Zenject;
+using Object = UnityEngine.Object;
 
 namespace SimplePopupManager
 {
@@ -16,7 +19,15 @@ namespace SimplePopupManager
     /// </summary>
     public class PopupManagerServiceService : IPopupManagerService
     {
+        private DiContainer _container;
+
         private readonly Dictionary<string, GameObject> m_Popups = new();
+        private readonly Dictionary<string, AsyncOperationHandle<GameObject>> m_asyncOperationHandles = new();
+
+        public PopupManagerServiceService(DiContainer container)
+        {
+            _container = container;
+        }
 
         /// <summary>
         ///     Opens a popup by its name and initializes it with the given parameters.
@@ -24,7 +35,7 @@ namespace SimplePopupManager
         /// </summary>
         /// <param name="name">The name of the popup to open.</param>
         /// <param name="param">The parameters to initialize the popup with.</param>
-        public async void OpenPopup(string name, object param)
+        public async void OpenPopup(string name, object param = null)
         {
             if (m_Popups.ContainsKey(name))
             {
@@ -45,9 +56,11 @@ namespace SimplePopupManager
             if (!m_Popups.ContainsKey(name))
                 return;
 
-            GameObject popup = m_Popups[name];
-            Addressables.ReleaseInstance(popup);
+            Object.Destroy(m_Popups[name]);
+            Addressables.Release(m_asyncOperationHandles[name]);
+
             m_Popups.Remove(name);
+            m_asyncOperationHandles.Remove(name);
         }
 
         /// <summary>
@@ -59,12 +72,12 @@ namespace SimplePopupManager
         /// <param name="param">The parameters to initialize the popup with.</param>
         private async Task LoadPopup(string name, object param)
         {
-            AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(name);
+            AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>(name);
             await handle.Task;
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                GameObject popupObject = handle.Result;
+                GameObject popupObject = _container.InstantiatePrefab(handle.Result);
 
                 popupObject.SetActive(false);
                 IPopupInitialization[] popupInitComponents = popupObject.GetComponents<IPopupInitialization>();
@@ -76,6 +89,7 @@ namespace SimplePopupManager
 
                 popupObject.SetActive(true);
 
+                m_asyncOperationHandles.Add(name, handle);
                 m_Popups.Add(name, popupObject);
             }
             else

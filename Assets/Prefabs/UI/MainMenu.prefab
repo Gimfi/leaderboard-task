@@ -271,7 +271,7 @@ GameObject:
   - component: {fileID: 6869895338342238336}
   - component: {fileID: 6869895338342238348}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -368,7 +368,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6869895338342238343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff123e1d1a1a645478acf6dcd7a8316a, type: 3}
+  m_Script: {fileID: 11500000, guid: 68cad77070c3aa941af35423840c17d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _leaderboardButton: {fileID: 6869895337934905474}

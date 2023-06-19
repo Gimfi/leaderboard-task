@@ -1,9 +1,10 @@
+using SimplePopupManager;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using View.UI.Constants;
+using Zenject;
 
 namespace View.UI.Leaderboards
 {
@@ -18,6 +19,14 @@ namespace View.UI.Leaderboards
         [SerializeField]
         private Image _avatar;
 
+        private ILoadImageService _loadImageService;
+
+        [Inject]
+        private void Initialize(ILoadImageService loadImageService)
+        {
+            _loadImageService = loadImageService;
+        }
+
         public async Task Init(PlayerDataItem playerDataItem)
         {
             _name.text = playerDataItem.name;
@@ -25,10 +34,10 @@ namespace View.UI.Leaderboards
 
             _avatar.gameObject.SetActive(false);
             _loadText.gameObject.SetActive(true);
-            Texture2D avatar = await GetRemoteTexture(playerDataItem.avatar);
+            _avatar.sprite = await _loadImageService.GetRemoteTexture(playerDataItem.avatar);
             _loadText.gameObject.SetActive(false);
             _avatar.gameObject.SetActive(true);
-            _avatar.sprite = Sprite.Create(avatar, new Rect(0, 0, avatar.width, avatar.height), new Vector2(0, 0));
+
 
             UpdateViewByType(playerDataItem.type);
         }
@@ -67,20 +76,6 @@ namespace View.UI.Leaderboards
 
                 default:
                     break;
-            }
-        }
-
-        public async Task<Texture2D> GetRemoteTexture(string url)
-        {
-            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
-            {
-                UnityWebRequestAsyncOperation asyncOp = www.SendWebRequest();
-                while (asyncOp.isDone == false)
-                {
-                    await Task.Delay(100);
-                }
-
-                return DownloadHandlerTexture.GetContent(www);
             }
         }
     }

@@ -5,6 +5,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using View.UI.Constants;
+using Zenject;
 
 namespace View.UI.Leaderboards
 {
@@ -17,12 +18,19 @@ namespace View.UI.Leaderboards
         [SerializeField]
         private Transform _recordsContainer;
 
+        private DiContainer _container;
         private IPopupManagerService _popupManagerServiceService;
+        private AsyncOperationHandle<Object> _leaderboardJSONHandle;
+
+        [Inject]
+        private void Initialize(DiContainer container, IPopupManagerService popupManagerService)
+        {
+            _container = container;
+            _popupManagerServiceService = popupManagerService;
+        }
 
         public async Task Init(object param)
         {
-            _popupManagerServiceService = param as IPopupManagerService;
-
             object leaderboardObject = await LoadLeaderboards();
             PlayerDataList playerDataList = GetPlayerDataList(leaderboardObject);
             CreateLeaderboardsView(playerDataList);
@@ -32,10 +40,10 @@ namespace View.UI.Leaderboards
 
         private async Task<object> LoadLeaderboards()
         {
-            AsyncOperationHandle<Object> handle = Addressables.LoadAssetAsync<Object>(UIConstants.LeaderboardJSONName);
-            await handle.Task;
+            _leaderboardJSONHandle = Addressables.LoadAssetAsync<Object>(UIConstants.LeaderboardJSONName);
+            await _leaderboardJSONHandle.Task;
 
-            return handle.Result;
+            return _leaderboardJSONHandle.Result;
         }
 
         private PlayerDataList GetPlayerDataList(object param)
@@ -48,7 +56,7 @@ namespace View.UI.Leaderboards
         {
             foreach (PlayerDataItem playerDataItem in playerDataList.leaderboard)
             {
-                LeaderboardPlayerRecordView playerRecordView = Instantiate(_leaderboardPlayerRecordView, _recordsContainer);
+                LeaderboardPlayerRecordView playerRecordView = _container.InstantiatePrefabForComponent<LeaderboardPlayerRecordView>(_leaderboardPlayerRecordView, _recordsContainer);
                 Task init = playerRecordView.Init(playerDataItem);
                 playerRecordView.gameObject.SetActive(true);
             }
@@ -61,6 +69,7 @@ namespace View.UI.Leaderboards
 
         private void OnDestroy()
         {
+            Addressables.Release(_leaderboardJSONHandle);
             _closeButton.onClick.RemoveListener(CloseWindow);
         }
 

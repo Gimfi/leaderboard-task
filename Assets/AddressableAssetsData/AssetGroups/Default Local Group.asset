@@ -22,6 +22,10 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
+  - m_GUID: 59a2f1a05d3b3ba4cbbcd2da34e5f886
+    m_Address: MainMenu
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 6547dc2c1346b0f45ba72eed41e47c7a, type: 2}
   m_SchemaSet:

@@ -4,6 +4,7 @@ namespace View.UI.Constants
 {
     public static class UIConstants
     {
+        public const string MainMenuName = "MainMenu";
         public const string LeaderboardJSONName = "Leaderboard";
         public const string LeaderboardWindowName = "LeaderboardWindow";
 

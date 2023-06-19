@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: UIInstaller
   m_EditorClassIdentifier: 
   _windowSettings:
-    _mainMenuUI: {fileID: 6869895338342238348, guid: 59a2f1a05d3b3ba4cbbcd2da34e5f886, type: 3}
-    _leaderboardView: {fileID: 808163511196277110, guid: 160d878d2fca5584b8e13cf88a90e24f, type: 3}
+    _hudUi: {fileID: 6869895338342238348, guid: 59a2f1a05d3b3ba4cbbcd2da34e5f886, type: 3}

@@ -10,10 +10,8 @@ namespace Installers
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<PopupManagerServiceService>().AsSingle();
-            Container.BindInterfacesAndSelfTo<UIBinder>().AsSingle();
-
-
-            Container.BindFactory<MainMenuView, MainMenuView.Factory>().AsSingle();
+            Container.BindInterfacesTo<HudController>().AsSingle();
+            Container.BindInterfacesTo<LoadImageService>().AsSingle();
         }
     }
 }
